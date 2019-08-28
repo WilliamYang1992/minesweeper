@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"runtime"
 	"strconv"
 )
 
@@ -46,6 +47,21 @@ type Config struct {
 	MineCount int
 }
 
+// ClearScreen 清除屏幕内容
+func ClearScreen() {
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "linux", "darwin":
+		cmd = exec.Command("clear")
+	case "windows":
+		cmd = exec.Command("cls")
+	default:
+		panic("Can not clear the screen, Your platform is unsupported!")
+	}
+	cmd.Stdout = os.Stdout
+	cmd.Run()
+}
+
 func main() {
 	// 选择困难度
 	var difficulty Difficulty
@@ -60,9 +76,7 @@ func main() {
 		break
 	}
 	// 清除屏幕内容
-	cmd := exec.Command("clear")
-	cmd.Stdout = os.Stderr
-	cmd.Run()
+	ClearScreen()
 	// 初始化游戏
 	board := NewBoard(difficulty)
 	var input string
@@ -75,9 +89,7 @@ func main() {
 		fmt.Println("Input coordinates: eg. `0,1,c`, `2,1,m` or `3,3,s`")
 		_, err := fmt.Scanln(&input)
 		// 清除屏幕内容
-		cmd := exec.Command("clear")
-		cmd.Stdout = os.Stderr
-		cmd.Run()
+		ClearScreen()
 		fmt.Printf("Your input is %s\n", input)
 		if err != nil {
 			fmt.Println("Wrong input! Please try again.")
